@@ -33,11 +33,38 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
+          cache-dependency-path: |
+            **/requirements*.txt
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Create temporary script for Nuitka setup
+        run: |
+          echo "print('Nuitka environment setup')" > nuitka_setup_temp.py
+
+      - name: Install and Cache Nuitka with Nuitka-Action
+        uses: Nuitka/Nuitka-Action@main
+        with:
+          nuitka-version: main
+          script-name: nuitka_setup_temp.py
+          mode: standalone
+        continue-on-error: true
+
+      - name: Cleanup temporary build files (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          rm -f nuitka_setup_temp.py
+          rm -rf build nuitka_setup_temp.dist nuitka_setup_temp.build
+
+      - name: Cleanup temporary build files (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Remove-Item -Path nuitka_setup_temp.py -ErrorAction SilentlyContinue
+          Remove-Item -Path build, nuitka_setup_temp.dist, nuitka_setup_temp.build -Recurse -Force -ErrorAction SilentlyContinue
 
       - name: Build with Cython and Nuitka
         run: python build_ultimate.py
@@ -79,14 +106,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+          pattern: "*"
+          merge-multiple: false
+
+      - name: List downloaded artifacts
+        run: |
+          echo "Artifacts structure:"
+          find artifacts -type f || echo "No files found"
+          ls -la artifacts/ || echo "Artifacts directory not found"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.REPO_TOKEN }}
-          tag_name: ${{ inputs.version }}
-          name: Release ${{ inputs.version }}
+          tag_name: ${{ github.event.inputs.version }}
+          name: Release ${{ github.event.inputs.version }}
           files: artifacts/**/*
           generate_release_notes: true
           draft: false
           prerelease: false
+          fail_on_unmatched_files: false
