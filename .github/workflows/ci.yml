@@ -74,19 +74,39 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ inputs.version }}"
+          $os = "Windows"
+          $arch = (python -c "import platform; print(platform.machine().lower())")
           $file = Get-ChildItem -Path dist -File | Select-Object -First 1
           if ($file) {
-            $newname = "$version-$($file.Name)"
+            $newname = "$version-$os-$arch-$($file.Name)"
             Rename-Item -Path $file.FullName -NewName $newname
+            Write-Host "Renamed to: $newname"
           }
 
-      - name: Rename artifact (Linux/macOS)
-        if: runner.os != 'Windows'
+      - name: Rename artifact (Linux)
+        if: runner.os == 'Linux'
         run: |
           version="${{ inputs.version }}"
+          os="Linux"
+          arch=$(python -c "import platform; print(platform.machine().lower())")
           file=$(ls dist/* 2>/dev/null | head -n 1 | xargs -n 1 basename)
           if [ -n "$file" ]; then
-            mv "dist/$file" "dist/${version}-${file}"
+            newname="${version}-${os}-${arch}-${file}"
+            mv "dist/$file" "dist/$newname"
+            echo "Renamed to: $newname"
+          fi
+
+      - name: Rename artifact (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          version="${{ inputs.version }}"
+          os="macOS"
+          arch=$(python -c "import platform; print(platform.machine().lower())")
+          file=$(ls dist/* 2>/dev/null | head -n 1 | xargs -n 1 basename)
+          if [ -n "$file" ]; then
+            newname="${version}-${os}-${arch}-${file}"
+            mv "dist/$file" "dist/$newname"
+            echo "Renamed to: $newname"
           fi
 
       - name: Upload artifact
