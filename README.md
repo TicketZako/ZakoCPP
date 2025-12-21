@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python)
-![License](https://img.shields.io/badge/License-GPL%20v3-green?style=for-the-badge)
+![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)
 ![CLI](https://img.shields.io/badge/Interface-CLI-purple?style=for-the-badge)
 
 **ヾ(◍°∇°◍)ﾉﾞ 玖殇真得超级可爱呜 ～**
@@ -68,7 +68,7 @@ ZakoCPP 是一个专为 [无差别同人站](https://cp.allcpp.cn/) 设计的票
 
 ## 许可证与开源说明
 
-本项目采用 [GNU General Public License v3.0](LICENSE) 许可证。
+本项目采用 [Apache License 2.0](LICENSE) 许可证。
 
 > [!NOTE]
 > - 本项目的**部分代码**已开源，可在本仓库查看
