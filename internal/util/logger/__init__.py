@@ -5,16 +5,17 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from queue import Queue, Full, Empty
+from queue import Empty, Full, Queue
 from sys import exc_info
 from threading import Lock, Thread
 from time import sleep, time
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 from click import style
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
 
+from internal.util.device import DeviceUtils
 from internal.util.system import SystemUtils
 
 
@@ -23,9 +24,6 @@ class LogConfigModel(BaseModel):
     Pydantic 配置模型，描述所有配置项及其类型和默认值
     """
 
-    class Config:
-        extra = "ignore"  # 忽略未定义的配置项
-
     # 配置文件目录
     CONFIG_DIR: Optional[str] = None
     # 是否为调试模式
@@ -33,9 +31,9 @@ class LogConfigModel(BaseModel):
     # 日志级别（DEBUG、INFO、WARNING、ERROR等）
     LOG_LEVEL: str = "INFO"
     # 日志文件最大大小（单位：MB）
-    LOG_MAX_FILE_SIZE: int = 5
+    LOG_MAX_FILE_SIZE: int = 10
     # 备份的日志文件数量
-    LOG_BACKUP_COUNT: int = 10
+    LOG_BACKUP_COUNT: int = 100
     # 控制台日志格式
     LOG_CONSOLE_FORMAT: str = "%(leveltext)s[%(name)s] %(asctime)s %(message)s"
     # 文件日志格式
@@ -48,6 +46,8 @@ class LogConfigModel(BaseModel):
     BATCH_WRITE_SIZE: int = 50
     # 写入超时时间（秒）
     WRITE_TIMEOUT: float = 3.0
+
+    model_config = ConfigDict(extra="ignore")
 
 
 class LogSettings(BaseSettings, LogConfigModel):
@@ -73,21 +73,11 @@ class LogSettings(BaseSettings, LogConfigModel):
         """
         return self.LOG_MAX_FILE_SIZE * 1024 * 1024
 
-    class Config:
-        case_sensitive = True
+    model_config = ConfigDict(case_sensitive=True)
 
 
 # 实例化日志设置
 log_settings = LogSettings()
-
-# 日志级别颜色映射
-level_name_colors = {
-    logging.DEBUG: lambda level_name: style(str(level_name), fg="cyan"),
-    logging.INFO: lambda level_name: style(str(level_name), fg="green"),
-    logging.WARNING: lambda level_name: style(str(level_name), fg="yellow"),
-    logging.ERROR: lambda level_name: style(str(level_name), fg="red"),
-    logging.CRITICAL: lambda level_name: style(str(level_name), fg="bright_red"),
-}
 
 
 class CustomFormatter(logging.Formatter):
@@ -95,13 +85,21 @@ class CustomFormatter(logging.Formatter):
     自定义日志输出格式
     """
 
+    level_name_colors = {
+        logging.DEBUG: lambda level_name: style(str(level_name), fg="cyan"),
+        logging.INFO: lambda level_name: style(str(level_name), fg="green"),
+        logging.WARNING: lambda level_name: style(str(level_name), fg="yellow"),
+        logging.ERROR: lambda level_name: style(str(level_name), fg="red"),
+        logging.CRITICAL: lambda level_name: style(str(level_name), fg="bright_red"),
+    }
+
     def __init__(self, fmt=None):
         super().__init__(fmt)
 
     def format(self, record):
         separator = " " * (8 - len(record.levelname))
         record.leveltext = (
-            level_name_colors[record.levelno](record.levelname + ":") + separator
+            self.level_name_colors[record.levelno](record.levelname + ":") + separator
         )
         return super().format(record)
 
@@ -491,7 +489,7 @@ class LoggerManager:
         caller_name = self.__get_caller()
 
         # 获取 machine_id
-        machine_id = SystemUtils.get_machine_id()[:12]
+        machine_id = DeviceUtils.get_guid()[:12]
 
         # 使用 f-string 安全地格式化，避免 % 带来的问题
         message_body = msg

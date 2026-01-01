@@ -13,7 +13,7 @@ class ProductTypeData(BaseModel):
     id: int = Field(default=0, description="票档 ID")
     name: str = Field(default="", description="票档名称")
     square: str = Field(default="", description="场次名称")
-    ticketPrice: int = Field(default=0, description="票档价格")
+    price: int = Field(default=0, description="票档价格")
     purchaseNum: int = Field(default=0, description="可购买数量")
     remainderNum: int = Field(default=0, description="剩余数量")
     lockNum: int = Field(default=0, description="已锁定数量")
@@ -42,4 +42,4 @@ class ProductConfig(AutoSaveConfig):
     ticketType: ProductTypeData = Field(
         default_factory=ProductTypeData, description="票档信息"
     )
-    ticketMethod: Literal["wx", "ali"] = Field(default="wx", description="购票方式")
+    ticketMethod: Literal["wx", "ali"] = Field(default="ali", description="购票方式")

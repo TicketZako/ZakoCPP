@@ -1,6 +1,6 @@
-from internal.client.api import cpp_client_info, cpp_device_info, net_client
+from internal.client.net import net_manager
 from internal.data.response import CreateOrderResponse, CreateOrderResponsePatcher
-from internal.util import Sign, log
+from internal.util import log
 
 
 class OrderApi:
@@ -27,15 +27,28 @@ class OrderApi:
         """
 
         url = ""
-
-        nonce, timestamp, sign = Sign.generate_sign(ticket_type_id)
-
         params = {}
         json_data = {}
-        resp = net_client.request("post", url, json=json_data, params=params)
+        headers = {}
+        resp = net_manager.request(
+            "post", url, json=json_data, params=params, headers=headers
+        )
 
-        result = resp.data.get("isSuccess", False)
-        if result:
+        if resp.code != -1:
+            return CreateOrderResponse(
+                code=resp.code,
+                msg=resp.msg,
+                data=None,
+            )
+
+        try:
+            success = resp.data["isSuccess"]
+            result = resp.data["result"]
+        except Exception:
+            success = False
+            result = None
+
+        if success:
             resp.code = 0
         else:
             resp.code = CreateOrderResponsePatcher.code(resp.msg)
@@ -45,5 +58,5 @@ class OrderApi:
         return CreateOrderResponse(
             code=resp.code,
             msg=resp.msg,
-            data=resp.data.get("result", None),
+            data=result,
         )

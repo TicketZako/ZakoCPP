@@ -17,7 +17,7 @@ class ValidatorUtils:
         """
         if not phone:
             return False
-        # 中国手机号验证：11位数字，以1开头，第二位为3-9
+        # 中国手机号验证：11 位数字，以 1 开头，第二位为 3-9
         pattern = r"^1[3-9]\d{9}$"
         return bool(re.match(pattern, phone))
 

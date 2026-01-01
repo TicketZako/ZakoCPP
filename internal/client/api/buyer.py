@@ -1,6 +1,6 @@
-from internal.client.api import cpp_client_info, cpp_device_info, net_client
+from internal.client.net import net_manager
 from internal.data.response import QueryBuyerResponse
-from internal.error import GetBuyerError
+from internal.util import log
 
 
 class BuyerApi:
@@ -17,10 +17,15 @@ class BuyerApi:
         """
         url = ""
         params = {}
-        resp = net_client.request("get", url, params=params)
+        resp = net_manager.request("get", url, params=params)
 
         if resp.code != -1:
-            raise GetBuyerError("获取购票人信息失败")
+            log.error(f"获取购票人信息失败: {resp.msg}")
+            return QueryBuyerResponse(
+                code=resp.code,
+                msg=resp.msg,
+                data=None,
+            )
 
         return QueryBuyerResponse(
             code=0,

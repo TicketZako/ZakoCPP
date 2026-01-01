@@ -1,4 +1,4 @@
-from internal.error.error import GetBuyerError, GetProductError
+from internal.error.error import NotificationError
 from internal.error.status import (
     BuyerStatusCode,
     LoginStatusCode,
@@ -7,9 +7,8 @@ from internal.error.status import (
 )
 
 __all__ = [
+    "NotificationError",
     "BuyerStatusCode",
-    "GetBuyerError",
-    "GetProductError",
     "LoginStatusCode",
     "OrderStatusCode",
     "ProductStatusCode",

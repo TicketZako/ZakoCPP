@@ -1,13 +1,13 @@
-from sys import exit
+from io import StringIO
 from re import compile
-from time import sleep
 from typing import Any
 
-from inquirer import Text, Confirm, List, Checkbox, Password, prompt
+from inquirer import Checkbox, Confirm, List, Password, Text, prompt
 from inquirer.themes import GreenPassion
+from qrcode.main import QRCode
 
-from internal.util.system import SystemUtils
 from internal.util.logger import log
+from internal.util.system import SystemUtils
 
 
 class CustomThemes(GreenPassion):
@@ -220,8 +220,8 @@ class CliUtils:
         if res is None:
             log.error("【交互】未知错误!")
             log.warning("程序正在准备退出...")
-            sleep(5)
-            exit(1)
+            SystemUtils.sleep(5000)
+            SystemUtils.exit(1)
 
         if type == "Text":
             p = compile(r"\x1b\[[0-9;]*[mHJ]|[\r\n\x7f\x00-\x1f]")
@@ -346,3 +346,17 @@ class CliUtils:
                 log.error(f"执行菜单项 '{selected}' 时出错: {e}")
                 CliUtils.print("", end="\n")
                 continue
+
+    @staticmethod
+    def print_qrcode(data: str) -> None:
+        """
+        打印二维码到终端界面
+
+        :param data: 二维码数据
+        """
+        qr = QRCode()
+        qr.add_data(data)
+        f = StringIO()
+        qr.print_ascii(out=f)
+        f.seek(0)
+        print(f.read())

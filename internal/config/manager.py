@@ -7,11 +7,11 @@ from yaml import dump, safe_load
 from internal.config.account import AccountConfig
 from internal.config.autosave import AutoSaveList
 from internal.config.buyer import BuyerConfig
+from internal.config.cloud import CloudConfig
 from internal.config.notification import NotificationConfig
 from internal.config.product import ProductConfig
 from internal.config.setting import SettingConfig
-from internal.util.crypto import AES
-from internal.util.system import SystemUtils
+from internal.util import AESUtils, DeviceUtils, SystemUtils
 
 
 class ConfigManager(BaseModel):
@@ -24,6 +24,7 @@ class ConfigManager(BaseModel):
     buyer: BuyerConfig = Field(default_factory=BuyerConfig)
     notification: NotificationConfig = Field(default_factory=NotificationConfig)
     product: ProductConfig = Field(default_factory=ProductConfig)
+    cloud: CloudConfig = Field(default_factory=CloudConfig)
 
     _config_path: Optional[Path] = PrivateAttr(default=None)
     _machine_id: Optional[str] = PrivateAttr(default=None)
@@ -41,7 +42,7 @@ class ConfigManager(BaseModel):
         """
         super().__init__(**data)
         self._config_path = config_path or SystemUtils.get_config_path() / "config.yaml"
-        self._machine_id = SystemUtils.get_machine_id()
+        self._machine_id = DeviceUtils.get_guid()
         self._auto_save = auto_save
         self._initialized = True
         self._setup_parent_refs()
@@ -98,7 +99,7 @@ class ConfigManager(BaseModel):
 
                 if self.setting.isEncrypt:
                     try:
-                        decrypted_content = AES.decrypt(content, self._machine_id)
+                        decrypted_content = AESUtils.decrypt(content, self._machine_id)
                         config_data = safe_load(decrypted_content)
                     except Exception:
                         config_data = safe_load(content)
@@ -149,7 +150,7 @@ class ConfigManager(BaseModel):
         )
 
         if self.setting.isEncrypt:
-            file_content = AES.encrypt(yaml_content, self._machine_id)
+            file_content = AESUtils.encrypt(yaml_content, self._machine_id)
         else:
             file_content = yaml_content
 
@@ -184,7 +185,7 @@ class ConfigManager(BaseModel):
         应用配置项到系统
         """
         try:
-            from internal.util.logger import log_settings, log
+            from internal.util.logger import log, log_settings
 
             log_settings.DEBUG = self.setting.isDebug
             log.update_loggers()
@@ -198,7 +199,14 @@ class ConfigManager(BaseModel):
         if not self._initialized:
             return
 
-        for attr_name in ["setting", "account", "buyer", "notification", "product"]:
+        for attr_name in [
+            "setting",
+            "account",
+            "buyer",
+            "notification",
+            "product",
+            "cloud",
+        ]:
             if hasattr(self, attr_name):
                 config_obj = getattr(self, attr_name)
                 self._setup_refs_recursive(config_obj, self)

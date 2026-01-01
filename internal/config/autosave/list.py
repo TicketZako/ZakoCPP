@@ -70,9 +70,9 @@ class AutoSaveList(list, Generic[T]):
     def __iadd__(self, other: list[T]) -> "AutoSaveList[T]":
         result = super().__iadd__(other)
         self._save()
-        return result
+        return result  # noqa
 
     def __imul__(self, n: int) -> "AutoSaveList[T]":
         result = super().__imul__(n)
         self._save()
-        return result
+        return result  # noqa

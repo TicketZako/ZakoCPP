@@ -1,3 +1,4 @@
-from apprise import Apprise
+from internal.core.notification.content import NotificationContent
+from internal.core.notification.manager import NotificationManager
 
-queue = Apprise()
+__all__ = ["NotificationManager", "NotificationContent"]

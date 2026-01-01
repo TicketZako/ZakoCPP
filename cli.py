@@ -1,9 +1,9 @@
+import os
 import signal
-import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 from internal.config import configer
-from internal.interface.entrance import CliEntrance
+from internal.interface.cli import CliEntrance
 from internal.util import SystemUtils, log
 
 
@@ -15,7 +15,7 @@ def signal_handler(signum, frame):
     :param frame: 当前堆栈帧
     """
     log.info("收到退出信号，正在安全退出...")
-    sys.exit(0)
+    os._exit(0)
 
 
 def main():

@@ -1,6 +1,11 @@
-from internal.client.net import NetClient
-from internal.data.request import CppClientInfo, CppDeviceInfo
+from internal.client.api.buyer import BuyerApi
+from internal.client.api.order import OrderApi
+from internal.client.api.product import ProductApi
+from internal.client.api.user import UserApi
 
-net_client = NetClient()
-cpp_client_info = CppClientInfo()
-cpp_device_info = CppDeviceInfo()
+__all__ = [
+    "BuyerApi",
+    "OrderApi",
+    "ProductApi",
+    "UserApi",
+]

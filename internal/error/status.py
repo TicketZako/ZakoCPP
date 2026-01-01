@@ -7,6 +7,7 @@ class LoginStatusCode:
     LoginError: int = 200000
     MissingAccount: int = 300000
     MissingPassword: int = 300001
+    Error: int = 999999
 
 
 class BuyerStatusCode:
@@ -16,6 +17,7 @@ class BuyerStatusCode:
 
     Success: int = 0
     MissingBuyer: int = 300000
+    Error: int = 999999
 
 
 class ProductStatusCode:
@@ -25,6 +27,8 @@ class ProductStatusCode:
 
     Success: int = 0
     NoStock: int = 100000
+    Inactive: int = 300000
+    Error: int = 999999
 
 
 class OrderStatusCode:
@@ -34,7 +38,11 @@ class OrderStatusCode:
 
     Success: int = 0
     NoStock: int = 100000
-    RequestLimited: int = 200000
-    RequestRisked: int = 200001
-    RequestBlocked: int = 200002
+    RequestLimited1: int = 200000
+    RequestLimited2: int = 200001
+    RequestLimited3: int = 200002
+    RequestLimited4: int = 200003
+    RequestBlocked: int = 200010
+    HTTPError: int = 200020
     OrderDuplicated: int = 300000
+    Error: int = 999999

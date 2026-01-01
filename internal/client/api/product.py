@@ -1,6 +1,6 @@
-from internal.client.api import cpp_client_info, cpp_device_info, net_client
+from internal.client.net import net_manager
 from internal.data.response import QueryProductResponse
-from internal.error import GetProductError
+from internal.util import log
 
 
 class ProductApi:
@@ -19,10 +19,16 @@ class ProductApi:
         """
         url = ""
         params = {}
-        resp = net_client.request("get", url, params=params)
+        headers = {}
+        resp = net_manager.request("get", url, params=params, headers=headers)
 
         if resp.code != -1:
-            raise GetProductError("获取活动信息失败")
+            log.error(f"获取活动信息失败: {resp.msg}")
+            return QueryProductResponse(
+                code=resp.code,
+                msg=resp.msg,
+                data=None,
+            )
 
         if "ticketTypeList" not in resp.data:
             return ProductApi.query_product(event_main_id)
