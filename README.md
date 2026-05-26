@@ -177,7 +177,13 @@ ZakoCPP 是一个专为 [无差别同人站](https://cp.allcpp.cn/) 设计的票
 
 **如果这个项目对你有帮助，不妨给个 Star 支持一下哦~ (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧**
 
-[![Star History Chart](https://api.star-history.com/svg?repos=TicketZako/ZakoCPP&type=Date)](https://star-history.com/#TicketZako/ZakoCPP&Date)
+<a href="https://www.star-history.com/?type=date&repos=TicketZako%2FZakoCPP">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=TicketZako/ZakoCPP&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=TicketZako/ZakoCPP&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=TicketZako/ZakoCPP&type=date&legend=top-left" />
+ </picture>
+</a>
 
 ---
 
